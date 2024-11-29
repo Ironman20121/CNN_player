@@ -19,7 +19,7 @@ def main():
     epochs = 2000
     learning_rate = 1e-3 
     # learning_rate-=1
-    patience = 10
+    patience = 50
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu') 
     print(f"Configuration batch_size  : {batch_size} ,epochs : {epochs} ,learning_rate : {learning_rate} , patience : {patience} , device : {device}",sep="\n")
     # Configuration
@@ -49,17 +49,18 @@ def main():
 
     # Model, Optimizer, and Loss Function no auto adjument lr fixed lr for now 
     model = SimpleCNN(num_classes=4).to(device)
-    # optimizer = optim.Adam(model.parameters(), lr=learning_rate)
-    optimizer = torch.optim.SGD(
-    model.parameters(),
-    lr=learning_rate,               # Initial learning rate
-    momentum=0.9,          # Momentum to accelerate convergence
-    weight_decay=5e-4      # Regularization to reduce overfitting
-)
+    optimizer = optim.Adam(model.parameters(), lr=learning_rate)
+    #model = torch.compile(model)
+#     optimizer = torch.optim.SGD(
+#     model.parameters(),
+#     lr=learning_rate,               # Initial learning rate
+#     momentum=0.9,          # Momentum to accelerate convergence
+#     weight_decay=5e-4      # Regularization to reduce overfitting
+# )
     criterion = nn.CrossEntropyLoss()
     
     
-    pretext task 1
+    #pretext task 1
     rotation_dataset_train = RotationDataset(train_dataset)
     train_rotation_loader = DataLoader(rotation_dataset_train, batch_size=batch_size, shuffle=True)
     print("Training Rotation task")
@@ -74,24 +75,25 @@ def main():
         epochs=200,
         patience=patience,
         device=device,
-        model_name = "pretext"
+        model_name = "pretext3"
     )
 
 
     print("Output layer is changing 4 to 10 ")
     ## changed layer for output
     model.fc = nn.Linear(256, 10)  # Adjust output layer for 10 classes
-    # optimizer = optim.Adam(model.parameters(), lr=learning_rate)
-    optimizer = torch.optim.SGD(
-    model.parameters(),
-    lr=learning_rate,               # Initial learning rate
-    momentum=0.9,          # Momentum to accelerate convergence
-    weight_decay=5e-4      # Regularization to reduce overfitting
-)
+    optimizer = optim.Adam(model.parameters(), lr=learning_rate)
+#     optimizer = torch.optim.SGD(
+#     model.parameters(),
+#     lr=learning_rate,               # Initial learning rate
+#     momentum=0.9,          # Momentum to accelerate convergence
+#     weight_decay=5e-4      # Regularization to reduce overfitting
+# )
 
     criterion = nn.CrossEntropyLoss()
 
     model = model.to(device)
+    #model = torch.compile(model)
     
     print("Training")
     print(model)
@@ -107,7 +109,7 @@ def main():
         epochs=epochs,
         patience=patience,
         device=device,
-        model_name="best_model",
+        model_name="best_model3",
         #resume="/home/kundan/Documents/project/best_model.pth"
     )
 
@@ -119,8 +121,8 @@ def main():
     print(f"Test Acc :{test_accuracy}")
     # Plot Metrics
     print("Ploting")
-    plot_metrics(history, save_path="./output/accuracy_loss.png")
-    plot_confusion_matrix(confusion_matrix, classes=dataset.classes, save_path="./output/confusion_matrix.png")
+    plot_metrics(history, save_path="./output/accuracy_loss3.png")
+    plot_confusion_matrix(confusion_matrix, classes=dataset.classes, save_path="./output/confusion_matrix3.png")
 
 if __name__ == "__main__":
     main()
